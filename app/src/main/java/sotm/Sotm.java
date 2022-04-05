@@ -4,6 +4,16 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
 public class Sotm {
+    public static class BallPosVel {
+        public Point3d pos;
+        public Vector3d vel;
+
+        public BallPosVel(Point3d pos, Vector3d vel) {
+            this.pos = pos;
+            this.vel = vel;
+        }
+    }
+
     /**
      * calculate the velocity of the ball initially after it has been shot
      *
@@ -21,10 +31,20 @@ public class Sotm {
         return initialVelocity;
     }
 
-    public static Point3d calculateNextPosition(Vector3d velocity, Point3d position, double CargoAngularVelocity,
+    public static Vector3d calculateAerodynamicForceVector(Vector3d ballVel, double cargoAngularVelocity) {
+        Vector3d aerodynamicForceVector = new Vector3d();
+        double aerodynamicForce = Constants.Aerodynamic.AERODYNAMIC_FORCE_COEFFICIENT * cargoAngularVelocity
+                * cargoAngularVelocity;
+        aerodynamicForceVector.scale(aerodynamicForce, ballVel);
+        return aerodynamicForceVector;
+    }
+
+    public static BallPosVel calculateNextPosition(BallPosVel ballPosVel, double cargoAngularVelocity,
             double timeStep) {
-        Point3d initialPosition = new Point3d(0, 0, 0);
-        return initialPosition;
+        Point3d pos = ballPosVel.pos;
+        Vector3d vel = ballPosVel.vel;
+        pos.interpolate(vel, timeStep);
+        return new BallPosVel(pos, vel);
     }
     // variable input: ball position, ball velocity
     // variable output: ball positoin when height is at goal height
