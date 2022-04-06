@@ -1,5 +1,7 @@
 package sotm;
 
+import java.lang.FdLibm.Pow;
+
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
@@ -23,9 +25,9 @@ public class Sotm {
      * @return initial velocity vector of the ball after being shot
      */
     public static Vector3d calculateInitialVelocity(double turretAngle, double hoodAngle, double velocity) {
-        double xyradius = Math.sin(hoodAngle) * velocity;
-        double x = Math.sin(turretAngle) * xyradius;
-        double y = Math.cos(turretAngle) * xyradius;
+        double xyRadius = Math.sin(hoodAngle) * velocity;
+        double x = Math.sin(turretAngle) * xyRadius;
+        double y = Math.cos(turretAngle) * xyRadius;
         double z = Math.cos(hoodAngle) * velocity;
         Vector3d initialVelocity = new Vector3d(x, y, z);
         return initialVelocity;
@@ -33,9 +35,10 @@ public class Sotm {
 
     public static Vector3d calculateAerodynamicForceVector(Vector3d ballVel, double cargoAngularVelocity) {
         Vector3d aerodynamicForceVector = new Vector3d();
-        double aerodynamicForce = Constants.Aerodynamic.AERODYNAMIC_FORCE_COEFFICIENT * cargoAngularVelocity
-                * cargoAngularVelocity;
-        aerodynamicForceVector.scale(aerodynamicForce, ballVel);
+        // equation from
+        // https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/ideal-lift-of-a-spinning-ball/#analysis
+        double liftForce = (4 / 3) * (4 * Math.pow(Math.PI, 2) * Math.pow(Constants.Cargo.CARGO_RADIUS, 3)
+                * cargoAngularVelocity * Constants.WorldMeasurements.AIR_DENSITY); // TODO: account for airflow velocity
         return aerodynamicForceVector;
     }
 
